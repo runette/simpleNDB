@@ -6,13 +6,13 @@ Provides a set of wrappers for the Google Cloud Python clients to be used on Pyt
 ## Installation
 
 ```
-$ pip install simpleNDB
+$ pip install simplendb
 ```
 
 The full package can be imported as follows:
 
 ```
-**from** simplendb **import** ndb, Users, images, users
+**from** simplendb **import** ndb, images, users
 ```
 
 
