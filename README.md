@@ -1,6 +1,6 @@
 # simpleNDB
 
-[![Travis CI](https://travis-ci.org/berlincode/ndb-orm.svg?branch=master&style=flat)](https://travis-ci.org/berlincode/ndb-orm)
+[![Travis CI](https://travis-ci.org/runette/simpleNDB.svg?branch=master&style=flat)](https://travis-ci.org/runette/simpleNDB)
 [![Python versions](https://img.shields.io/pypi/pyversions/simpleNDB.svg)](https://pypi.python.org/pypi/simpleNDB)
 [![MIT Licence](https://img.shields.io/pypi/l/simpleNDB.svg)](https://github.com/runette/simpleNDB/blob/master/LICENSE)
 
