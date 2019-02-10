@@ -1,7 +1,7 @@
 # simpleNDB
 
 [![Travis CI](https://travis-ci.org/berlincode/ndb-orm.svg?branch=master&style=flat)](https://travis-ci.org/berlincode/ndb-orm)
-[![Python versions](https://img.shields.io/pypi/pyversions/ndb-orm.svg)](https://pypi.python.org/pypi/ndb-orm/)
+[![Python versions](https://img.shields.io/pypi/pyversions/simpleNDB.svg)](https://pypi.python.org/pypi/simpleNDB)
 [![Apache License 2.0](https://img.shields.io/pypi/l/ndb-orm.svg)](https://github.com/berlincode/ndb-orm/blob/master/LICENSE.txt)
 
 ## Purpose
@@ -10,7 +10,7 @@ Provides a set of wrappers for the Google Cloud Python clients to be used on Pyt
 ## Installation
 
 ```shell
-$ pip install simplendb
+$ pip install simpleNDB
 ```
 
 The full package can be imported as follows:
