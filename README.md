@@ -2,7 +2,7 @@
 
 [![Travis CI](https://travis-ci.org/berlincode/ndb-orm.svg?branch=master&style=flat)](https://travis-ci.org/berlincode/ndb-orm)
 [![Python versions](https://img.shields.io/pypi/pyversions/simpleNDB.svg)](https://pypi.python.org/pypi/simpleNDB)
-[![MIT Licence](https://img.shields.io/pypi/l/simpleNDB.svg)](https://github.com//runette/simpleNDB/blob/master/LICENSE.txt)
+[![MIT Licence](https://img.shields.io/pypi/l/simpleNDB.svg)](https:/github.com//runette/simpleNDB/blob/master/LICENSE.txt)
 
 ## Purpose
 Provides a set of wrappers for the Google Cloud Python clients to be used on Python 3 App Engine Standard Edition instances to provide some of the abilities previously provided by the appengine api and ext libraries.
