@@ -5,7 +5,7 @@ Provides a set of wrappers for the Google Cloud Python clients to be used on Pyt
 
 ## Installation
 
-```
+```shell
 $ pip install simplendb
 ```
 
