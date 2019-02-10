@@ -30,4 +30,4 @@ This is a major change to the runtime environment - involving a complete change 
 - **NDB** - A simple NoSQL Network Database built on Cloud Datastore. Quick and easy to set up a schema.
 - **Users** - A simple, no setup way to authenticate users against their Google id and get the details. Allows you to create authenticated apps without effort.
 - **Blobstore** - a handy and simple way of storeing blobs and images.
-- **Images** - an inbuilt image handler optimised for the environment. Included the native __get_serving_url function that it loosk like will not be resurected :frowning
+- **Images** - an inbuilt image handler optimised for the environment. Included the native __get_serving_url function that it loosk like will not be resurected :angry:
