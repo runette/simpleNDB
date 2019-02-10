@@ -11,8 +11,8 @@ $ pip install simplendb
 
 The full package can be imported as follows:
 
-```
-**from** simplendb **import** ndb, images, users
+```python
+from simplendb import ndb, images, users
 ```
 
 
