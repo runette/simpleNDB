@@ -1,5 +1,1 @@
-attrdict
-google-cloud-datastore
-google-cloud-storage
-Pillow
-
+simpleNDB
