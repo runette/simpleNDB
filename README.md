@@ -3,6 +3,7 @@
 [![Travis CI](https://travis-ci.org/runette/simpleNDB.svg?branch=master&style=flat)](https://travis-ci.org/runette/simpleNDB)
 [![Python versions](https://img.shields.io/pypi/pyversions/simpleNDB.svg)](https://pypi.python.org/pypi/simpleNDB)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/runette/simpleNDB/blob/master/LICENSE)
+[![Known Vulnerabilities](https://snyk.io/test/github/runette/simpleNDB/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/runette/simpleNDB?targetFile=requirements.txt)
 
 ## Purpose
 Provides a set of wrappers for the Google Cloud Python clients to be used on Python 3 App Engine Standard Edition instances to provide some of the abilities previously provided by the appengine api and ext libraries.
