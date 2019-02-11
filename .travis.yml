@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_0a6446eb3ae3_key -iv $encrypted_0a6446eb3ae3_iv -in test/54ed4b23d713.json.enc -out test/54ed4b23d713.json -d
+  - openssl aes-256-cbc -K $encrypted_9e3f37841fae_key -iv $encrypted_9e3f37841fae_iv -in My\ Project-54ed4b23d713.json.enc -out ~\/Downloads/My\ Project-54ed4b23d713.json -d
   - export GOOGLE_APPLICATION_CREDENTIALS="test/54ed4b23d713.json"
 install:
   - pip install -r requirements.txt
