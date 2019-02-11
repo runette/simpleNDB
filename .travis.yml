@@ -6,6 +6,7 @@ before_install:
   -in My\ Project-54ed4b23d713.json.enc -out My\ Project-54ed4b23d713.json
   -d
 - export GOOGLE_APPLICATION_CREDENTIALS="My\ Project-54ed4b23d713.json"
+- cat %GOOGLE_APPLICATION_CREDENTIALS
 install:
 - pip install -r requirements.txt
 script:
