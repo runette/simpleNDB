@@ -194,7 +194,7 @@ gun.put()
 
 As with NDB - the enitity is not persisted until `put()` is called. All properties can be called using Object.attribute notation and that will keep the schema typing (i.e. enums are enums etc). The base object is a Dict so you can access the native Datastore values using the .['name'] notation.
 
-The `items()` method has been intercepted and will onlt provide a Dict copy of the vale of the schema properties (and no other properties or members). These are also the only values that will be persisted.
+The `items()` method has been intercepted and will only provide a Dict copy of the values of the schema properties (and no other properties or members). These are also the only values that will be persisted.
 
 ### Query Class
 #### Definition 
