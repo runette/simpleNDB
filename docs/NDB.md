@@ -206,7 +206,7 @@ The Query class is used to run queries and is as documented in the [Google Cloud
 Always create the query object using the `.query()` method on the Entity class - i.e. :
 
 ```python
-Gun.query(Gun.type==Gun.Types.BRONZE).order(Gun.gunid).fetch()
+Gun.query(filters=[("type", "==",Gun.Types.BRONZE)], order=[gunid]).fetch()
 ```
 ### Key Class
 #### Definition 
