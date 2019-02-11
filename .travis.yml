@@ -1,10 +1,12 @@
 language: python
 python:
-  - "3.6"
+- '3.6'
 before_install:
-  - openssl aes-256-cbc -K $encrypted_9e3f37841fae_key -iv $encrypted_9e3f37841fae_iv -in test/My\ Project-54ed4b23d713.json.enc -out test/My\ Project-54ed4b23d713.json -d
-  - export GOOGLE_APPLICATION_CREDENTIALS="test/54ed4b23d713.json"
+- openssl aes-256-cbc -K $encrypted_903ff9f80be0_key -iv $encrypted_903ff9f80be0_iv
+  -in My\ Project-54ed4b23d713.json.enc -out My\ Project-54ed4b23d713.json
+  -d
+- export GOOGLE_APPLICATION_CREDENTIALS="test/54ed4b23d713.json"
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-  - pytest test/ndb_test.py
+- pytest test/ndb_test.py
