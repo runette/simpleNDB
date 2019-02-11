@@ -106,10 +106,117 @@ In other environments you have to tell it where to find the credentials. This ma
 ## Reference
 
 ### Model class
+#### Definition
 
 This class is used as the parent for all simpleNDB Entity classes and is a sub-class of the Google Cloud Client [`Entity`](https://googleapis.github.io/google-cloud-python/latest/datastore/entities.html) class.
 
-The Model class requires that you set up a schema
+The Model class requires that you set up a schema in the Entity class definition as follows 
+
+```python
+class Gun(Model):
+    class Types(Enum):
+        CAST = 0
+        WROUGHT = 1
+        BRONZE = 2
+        NOT_KNOWN = 3
+        
+    class Quality(Enum):
+        GOLD = 2
+        SILVER = 1
+        BRONZE = 0
+    
+    def schema(self):
+        super().schema()
+        self.Property("gunid", ndb.IntegerProperty)
+        self.Property("location", ndb.GeoPtProperty)
+        self.Property("type", ndb.EnumProperty, enum=Gun.Types)
+        self.Property("quality", ndb.EnumProperty, enum=Gun.Quality,  default=Gun.Quality.BRONZE)
+        self.Property("description", ndb.StringProperty)
+        self.Property("name", ndb.StringProperty)
+        self.Property("date", ndb.DateTimeProperty, auto_now=True)
+        self.Property("images", ndb.TextProperty, repeated=True)
+        self.Property("markings", ndb.BooleanProperty)
+        self.Property("interpretation", ndb.BooleanProperty)
+        self.Property("country", ndb.StringProperty, default="none")
+        self.Property("geocode", ndb.JsonProperty)
+```
+
+The schema is defined in the in the `schema()` method. There should be one line per property of the format :
+
+```python
+self.Property("NAME_OF_PROPERTY", "PROPERTY_TYPE", **kwargs)
+```
+where PROPERTY_TYPE is defined by:
+
+```python
+class ndb(Enum):
+    IntegerProperty = (0, True, int)
+    FloatProperty = (1, False, float)
+    StringProperty = (2, True, str)
+    TextProperty = (3, False, str)
+    BooleanProperty = (4, True, bool)
+    DateTimeProperty = (5, True, datetime)
+    GeoPtProperty = (6, True, GeoPt)
+    KeyProperty = (7, True, Key)
+    JsonProperty = (8, False, str)
+    EnumProperty = (9, True, int)
+```
+and `**kwargs` are :
+
+```python
+repeated=True|False
+indexed=True|False
+default=
+auto_now=True|False
+```
+
+as per [NDB](https://cloud.google.com/appengine/docs/standard/python/ndb/entity-property-reference).
+
+The EnumProperty takes and addition key-word :
+
+```python
+enum=
+```
+giving the class for an enum which must be of type `enum` (and not `messages.ENUM`).
+
+#### Usage
+
+The Object entities are used in a similar way to the usage in NDB and keep all of the methods described in the Google Cloud Client `Entity` definition:
+
+```Python
+gun = Gun()
+gun.gunid = 12
+gun.name = "This is a name"
+gun.type = Gun.Type.WROUGHT
+name = gun.name
+gun.put()
+```
+
+As with NDB - the enitity is not persisted until `put()` is called. All properties can be called using Object.attribute notation and that will keep the schema typing (i.e. enums are enums etc). The base object is a Dict so you can access the native Datastore values using the .['name'] notation.
+
+The `items()` method has been intercepted and will onlt provide a Dict copy of the vale of the schema properties (and no other properties or members). These are also the only values that will be persisted.
+
+### Query Class
+#### Definition 
+
+The Query class is used to run queries and is as documented in the [Google Cloud Client documentation](https://googleapis.github.io/google-cloud-python/latest/datastore/queries.html).
+
+#### Usage
+
+Always create the query object using the `.query()` method on the Entity class - i.e. :
+
+```python
+Gun.query(Gun.type==Gun.Types.BRONZE).order(Gun.gunid).fetch()
+```
+### Key Class
+#### Definition 
+
+The Key class is an immutable representation of a datastore Key. and is as documented in the [Google Cloud Client documentation](https://googleapis.github.io/google-cloud-python/latest/datastore/keys.html).
+
+simpleNDB makes one addition the Key class - providing a `get()` method to allow the entity to be fetched from the datastore.
+
+Note that - is you fetch keys from querries they may be of type `datastore.Key` and not `ndb.Key` and then they will not have the `get()` method. You will need to do the conversion.
+
 
 ## Migration from AppEngine NDB
 
@@ -172,7 +279,7 @@ You need to set the following environments variables to tell it how to authentic
 ```shell
 GOOGLE_CLOUD_PROJECT = {{YOUR_GCP_PROJECT_ID}}
 GOOGLE_APPLICATION_CREDENTIALS = {{PATH_TO_AND_NAME_OF_THE_JSON_TOKEN}}
-DATASTORE_DATASET=ultima-ratio-221014
+DATASTORE_DATASET={{PROVIDED_BY_EMULATOR}}
 DATASTORE_EMULATOR_HOST=localhost:{{PORT_NUMBER_PROVIDED_BY_THE_EMULATIR}} 
 DATASTORE_EMULATOR_HOST_PATH={{PATH_PROVIDED_BY_THE_EMULATOR}}
 DATASTORE_HOST=http://localhost:{PORT_NUMBER_PROVIDED_BY_THE_EMULATOR}}
