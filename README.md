@@ -23,8 +23,8 @@ from simplendb import ndb, images, users
 To use the individual components, see :
 
 - [NDB](docs/NDB.md)
-- [Users](docs/Users.md)
-- [Images](docs/Images.md)
+- [Users](docs/USERS.md)
+- [Images](docs/IMAGES.md)
 
 ## Background and Concepts
 
