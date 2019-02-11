@@ -54,7 +54,7 @@ gun.put()
 - [Exclusions](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#exclusions)
 - [Authentication](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#authentication)
 - [Reference](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#reference)
-- [Migration from AppEngine](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#other-run-time-environments)
+- [Migration from AppEngine](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#migration-from-appengine-ndb)
 - [Other Run Time environments](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#other-run-time-environments)
 - [Dev Environment](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#dev-environment)
 
