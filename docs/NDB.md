@@ -50,22 +50,22 @@ gun.put()
 
 # Table of Contents
 
-- Description
-- Exclusions
-- Authentication
-- Reference
-- Migration from AppEngine
-- Other Run Time environments
-- Dev Environment
+- [Description](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#description)
+- [Exclusions](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#exclusions)
+- [Authentication](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#authentication)
+- [Reference](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#reference)
+- [Migration from AppEngine](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#other-run-time-environments)
+- [Other Run Time environments](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#other-run-time-environments)
+- [Dev Environment](https://github.com/runette/simpleNDB/blob/master/docs/NDB.md#dev-environment)
 
 ## Description
 
-The [NDB library](https://cloud.google.com/appengine/docs/standard/python/ndb/) (written by Guido) was a NoSQL database library running on top of [Google Cloud Datastore](https://cloud.google.com/datastore/docs/concepts/overview) was provided out-of-the-box in the Python 2.7 AppEngine runtime - making it a simple way of providing object persistence to web apps and cloud functions without a lot of boilerplate work.
+The [NDB library](https://cloud.google.com/appengine/docs/standard/python/ndb/) (written by Guido) is a NoSQL database library running on top of [Google Cloud Datastore](https://cloud.google.com/datastore/docs/concepts/overview) is was provided out-of-the-box in the Python 2.7 AppEngine runtime - making it a simple way of providing object persistence to web apps and cloud functions without a lot of boilerplate work.
 
 This library has been sunsetted in the Python 3.7 version of AppEngine Standard Edition. The Google Cloud Datastore Client do a good job of providing the basic functionality of Datastore and thus compatibility with entities created in NDB. It provides some basic functions we need:
 
 - **Works with NDB created entities** There are some exceptions - The Google Datastore client only works with *datetime* and not either *date* or *time* for instance ([see](https://googleapis.github.io/google-cloud-python/latest/datastore/entities.html))
-- **Provides the basic functions** /- i.e. `get()`, `put()`, `delete()` and `query()`
+- **Provides the basic functions** - i.e. `get()`, `put()`, `delete()` and `query()`
 - **provides ACID transactions**
 
 However, the resulting code does not match the way that NDB worked and is quite a task to migrate. The Entities are subclassed Dicts and only take the ['name'] notation and do not have a schema. We need :
@@ -105,13 +105,17 @@ In other environments you have to tell it where to find the credentials. This ma
 
 ## Reference
 
-which is a sub-class of the Google Cloud Client [`Entity`]() class. 
+### Model class
 
-## Migration from AppEngine
+This class is used as the parent for all simpleNDB Entity classes and is a sub-class of the Google Cloud Client [`Entity`](https://googleapis.github.io/google-cloud-python/latest/datastore/entities.html) class.
 
-There are a number of key differences :
+The Model class requires that you set up a schema
 
-1 The Class definition is different.
+## Migration from AppEngine NDB
+
+There are a three areas that need to be changed, described below.
+
+* The Class definition is different.
 
 - The Object class must be a sub-class of ndb.Model 
 - In SimpleNDB (for simplicity at my end) - the schema is defined in a method called `schema()`. This must be overloaded by the sub-clas and start :
@@ -127,13 +131,13 @@ and then has a line for each member of the schema of the form :
 self.Property("gunid", ndb.IntegerProperty)
 ```
 
-as described in the reference. This is actually quite a simple mechanical edi from the NDB equivalent which would have been :
+as described in the reference. This is actually quite a simple mechanical edit from the NDB equivalent which would have been :
 
 ```python
 gunid = ndb.IntegerProperty()
 ```
 
-- Queries, filters and order. SimpleNBD follows the Datastore [formats](https://googleapis.github.io/google-cloud-python/latest/datastore/queries.html) filters are 3-tuples :`('<property>', '<operator>', <value>)`; and the order attribute is on the Query constructor and not a seperate method.
+* Queries, filters and order. SimpleNBD follows the Datastore [formats](https://googleapis.github.io/google-cloud-python/latest/datastore/queries.html) filters are 3-tuples :`('<property>', '<operator>', <value>)`; and the order attribute is on the Query constructor and not a seperate method.
 
 So an NDB Query command :
 
@@ -147,13 +151,13 @@ becomes
 Gun.query(filters=[("type", "==",Gun.Types.BRONZE)], order=[gunid]).fetch()
 ```
 
-- Transactions. This model does not touch the Google Cloud Client approach to transactions. I have not tried any migrations to know what that involves.
+* Transactions. This model does not touch the Google Cloud Client approach to transactions. I have not tried any migrations to know what that involves.
 
 ## Other Run Time Environments
 
-This library and it's dependencies do **NOT** have anydependency on the Google Cloud Platform (i.e. AppEngine and ComputeEngine) to run. Therefore, this migration would also work for migration to other platforms.
+This library and it's dependencies do **NOT** have any dependency on the Google Cloud Platform (i.e. AppEngine and ComputeEngine) to run. Therefore, this approach would also work for migration to other platforms.
 
-Obviously, you still need a GCP project to provide the Google Cloud Datastore instance and credentials. You also need to make sure that those cedentials are registered to the Client in the same way as for the Dev environment below.
+Obviously, you still need a GCP project to provide the Google Cloud Datastore instance and credentials. You also need to make sure that those credentials are registered to the Client in the same way as for the Dev environment below.
 
 ## Dev Environment
 
@@ -163,9 +167,9 @@ The Google Cloud SDK does provide a datastore local emulator for this purpose - 
 
 For authentication - you need to create and download a JSON token for the service account for your GCP project from the console.
 
-You need to set the follwoing environments variables to tell it how to authenticate and to use the emulator rather than the remote service :
+You need to set the following environments variables to tell it how to authenticate and to use the emulator rather than the remote service :
 
-'''shell
+```shell
 GOOGLE_CLOUD_PROJECT = {{YOUR_GCP_PROJECT_ID}}
 GOOGLE_APPLICATION_CREDENTIALS = {{PATH_TO_AND_NAME_OF_THE_JSON_TOKEN}}
 DATASTORE_DATASET=ultima-ratio-221014
@@ -173,3 +177,4 @@ DATASTORE_EMULATOR_HOST=localhost:{{PORT_NUMBER_PROVIDED_BY_THE_EMULATIR}}
 DATASTORE_EMULATOR_HOST_PATH={{PATH_PROVIDED_BY_THE_EMULATOR}}
 DATASTORE_HOST=http://localhost:{PORT_NUMBER_PROVIDED_BY_THE_EMULATOR}}
 DATASTORE_PROJECT_ID={{YOUR_GCP_PROJECT_ID}}
+```
