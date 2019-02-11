@@ -8,7 +8,7 @@ This library can work in any run time environment - not just GAE - but it is dep
 ## Installation
 
 ```python
-from simplendn.images install ndbImages, ndbBlob
+from simplendb.images install ndbImages, ndbBlob
 ```
 
 ## Typical Usage
@@ -106,7 +106,7 @@ ndbImage also provides the following methods:
 
 #### Formats
 
-Image formats and types get a bit complicated.
+Image formats and types get a bit complicated. The Cloud Storage 
 
 All Cloud Storage items need a 
 
