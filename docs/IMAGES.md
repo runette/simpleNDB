@@ -59,7 +59,7 @@ In other environments you have to tell it where to find the credentials. This ma
 ### Blob Class
 #### Definition
 
-The Blob class is used as a container for the objects stored on [Google Cloud Storage](https://cloud.google.com/storage/). The Blob class contains an instance of a Google Cloud Storage Client[Blob](https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html) class.
+The Blob class is used as a container for the objects stored on [Google Cloud Storage](https://cloud.google.com/storage/). The Blob class contains an instance of a Google Cloud Storage Client [Blob](https://googleapis.github.io/google-cloud-python/latest/storage/blobs.html) class.
 
 The only methods on this class are:
 
@@ -115,11 +115,11 @@ image_32.put()
 
 Image formats and types get a bit complicated. The Cloud Storage Client needs a `content-type` when uploading and creating an object. This is held as `Blob().content_type` and is set from the downloaded object when you issue a `get()` but for new content you have to do it your self for new content. The Blob class defaults to `application/octet-stream` but this will cause problems if the blob is an image.
 
-The Pillow Image class needs a `content_format` as per the[Pillow docs](https://pillow.readthedocs.io/en/3.1.x/reference/Image.html). This is held by the ndbImage class as `ndbImage().content_format` and is set from the downloaded image and for images created from ndbImage objects.
+The Pillow Image class needs a `content_format` as per the [Pillow docs](https://pillow.readthedocs.io/en/3.1.x/reference/Image.html). This is held by the ndbImage class as `ndbImage().content_format` and is set from the downloaded image and for images created from ndbImage objects.
 
-The ndbImage class defaults `content_type` to `image/jpeg` and `content_format` to `JPEG`.
+The ndbImage class defaults `content_type` to `image/jpeg` and `content_format` to `JPEG`. 
 
-##Dev Environment
+## Dev Environment
 
 As part of the change to Python 3 and idiomatic use of Python - you also do not have dev_appserver anymore. This means more work setting up the dev environment.
 
@@ -129,5 +129,7 @@ For authentication - you need to create and download a JSON token for the servic
 
 You need to set the following environments variables to tell it how to authenticate and to use the emulator rather than the remote service :
 
+```shell
 GOOGLE_CLOUD_PROJECT = {{YOUR_GCP_PROJECT_ID}}
 GOOGLE_APPLICATION_CREDENTIALS = {{PATH_TO_AND_NAME_OF_THE_JSON_TOKEN}}
+```
