@@ -1,23 +1,19 @@
 # images Module
 ## Purpose
 
-This module provides wrappers to the Google Cloud Storage Client library  and Pillow to give them some of the functionality of te appenegine Images library and to work nicely together.
+This module provides wrappers to the [Google Cloud Storage Client library](https://googleapis.github.io/google-cloud-python/latest/index.html)  and [Pillow](https://pillow.readthedocs.io/en/stable/) to give them some of the functionality of te appenegine Images library and to work nicely together.
 
 This library can work in any run time environment - not just GAE - but it is dependent on Google Cloud Storage backend for storage.
 
 ## Installation
 
 ```python
-from simplendb.images install ndbImages, ndbBlob
+from simplendb.images install ndbImages, Blob
 ```
 
 ## Typical Usage
 
 ```python
-def get_serving_url(upload_metadata):
-    bucket_name = upload_metadata.get('bucket')
-    full_path = upload_metadata.get('fullPath')
-    folder = full_path.replace('/original', '')
     original = ndbImage(full_path, bucket_name)
     original.get()
     thumb_32 = original.resize((32,32), folder + "/32x32")
@@ -29,11 +25,11 @@ def get_serving_url(upload_metadata):
 ```
 ### Table of Contents
 
-- Description
-- Exclusions
-- Authentication
-- Reference
-- Dev Environement
+- [Description](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#description)
+- [Exclusions](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#exclusions)
+- [Authentication](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#authentication)
+- [Reference](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#authentication)
+- [Dev Environment]()
 
 ### Description
 
@@ -47,7 +43,7 @@ This library does that integration out of the box.
 
 The GAE Image class included the excellent "real-time resizable" `_get_serving_url()` links (if you do not know what that means - don't worry because they have gone away).
 
-Unfortunately - they are no longer available (as far as I know). Because of this - I have avoided putting in a `_get_serving_url()` method as this would lead to confusion. You can get get the public link from `get_media_link`.
+Unfortunately - they are no longer available (as far as I know). Because of this - I have avoided putting in a `_get_serving_url()` method as this would lead to confusion. You can get get the public link from `get_media_link()`.
 
 ## Authentication
 
@@ -72,6 +68,8 @@ The only methods on this class are:
 
 `get()` returns an io.ByteIO object. 
 `put()` requires an io.ByteIO object.
+
+Google Cloud Storage Client `Blob()` methods should be run on the `.blob` property in the Blob class object.
 
 #### Usage
 
@@ -104,14 +102,6 @@ ndbImage also provides the following methods:
 
 - `get_media_link()` - gets the Cloud Storage public media access URL for this object.
 
-#### Formats
-
-Image formats and types get a bit complicated. The Cloud Storage 
-
-All Cloud Storage items need a 
-
-are as per the [Pillow docs](https://pillow.readthedocs.io/en/3.1.x/reference/Image.html). The 
-
 #### Usage
 
 ```python
@@ -121,4 +111,23 @@ image_32 = image.resize((32,32), "dev/1/image_32.jpeg")
 image_32.put()
 ```
 
+#### Formats
 
+Image formats and types get a bit complicated. The Cloud Storage Client needs a `content-type` when uploading and creating an object. This is held as `Blob().content_type` and is set from the downloaded object when you issue a `get()` but for new content you have to do it your self for new content. The Blob class defaults to `application/octet-stream` but this will cause problems if the blob is an image.
+
+The Pillow Image class needs a `content_format` as per the [Pillow docs] (https://pillow.readthedocs.io/en/3.1.x/reference/Image.html). This is held by the ndbImage class as `content_format` and is set from the downloaded image and for images created from ndbImage objects.
+
+The ndbImage class defaults `content_type` to `image/jpeg` and `content_format` to `JPEG`.
+
+##Dev Environment
+
+As part of the change to Python 3 and idiomatic use of Python - you also do not have dev_appserver anymore. This means more work setting up the dev environment.
+
+The Google Cloud SDK does NOT provide a storage local emulator. Therefore - you have to use the production system and set up development databases yourself.
+
+For authentication - you need to create and download a JSON token for the service account for your GCP project from the console.
+
+You need to set the following environments variables to tell it how to authenticate and to use the emulator rather than the remote service :
+
+GOOGLE_CLOUD_PROJECT = {{YOUR_GCP_PROJECT_ID}}
+GOOGLE_APPLICATION_CREDENTIALS = {{PATH_TO_AND_NAME_OF_THE_JSON_TOKEN}}
