@@ -1,7 +1,10 @@
 language: python
 python:
-  - "3.6"
+- '3.6'
+before_install:
+- openssl aes-256-cbc -K $encrypted_903ff9f80be0_key -iv $encrypted_903ff9f80be0_iv
+  -in 54ed4b23d713.json.enc -out 54ed4b23d713.json -d
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-  - pytest test/ndb_test.py
+- pytest test/ndb_test.py
