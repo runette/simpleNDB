@@ -28,7 +28,7 @@ from simplendb.images install ndbImages, Blob
 - [Description](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#description)
 - [Exclusions](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#exclusions)
 - [Authentication](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#authentication)
-- [Reference](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#authentication)
+- [Reference](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#reference)
 - [Dev Environment](https://github.com/runette/simpleNDB/blob/master/docs/IMAGES.md#dev-environment)
 
 ### Description
