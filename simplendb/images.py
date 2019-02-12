@@ -27,21 +27,41 @@ import io
 __all__=["ndbImage"]
 
 
-class ndbImage(object): 
-    
-    content_type = "image/jpeg"
-    content_format = "JPEG"
+class Blob(object):  
     
     def __init__(self, full_path, bucket_name):
-        self.client = storage.Client()
-        self.bucket = self.client.get_bucket(bucket_name)
-        self.full_path = full_path
+        try:
+            self.client = storage.Client()
+            self.bucket = self.client.get_bucket(bucket_name)
+            self.full_path = full_path
+            self.content_type = "application/octet-stream"
+        except:
+            raise ValueError("Bucket not found")
         
     def get(self):
         self.blob = self.bucket.get_blob(self.full_path)
         self.content_type = self.blob.content_type
         buffer = io.BytesIO(self.blob.download_as_string())
         buffer.seek(0)
+        return buffer
+        
+    def put(self, buffer, content_type=None):
+        if content_type:
+            self.content_type = content_type
+        blob = getattr(self, 'blob', self.bucket.blob(self.full_path))
+        blob.upload_from_file(file_obj=buffer, content_type=self.content_type, rewind=True)
+        self.blob = blob
+
+
+class ndbImage(Blob): 
+    
+    def __init__(self, full_path, bucket_name):
+        super().__init__(full_path, bucket_name)
+        self.content_type = "image/jpeg"
+        self.content_format = "JPEG"
+             
+    def get(self):
+        buffer = super().get()
         self.image = Image.open(buffer)
         
     def put(self, content_type=None, content_format=None):
@@ -49,15 +69,11 @@ class ndbImage(object):
             raise ValueError("ndbImage must have content_type and format for a put")
         if content_format :
             self.content_format = content_format
-        if content_type:
-            self.content_type = content_type
         if not hasattr(self, 'image'):
             raise ValueError("no Image to put")
         buffer = io.BytesIO()
         self.image.save(buffer, self.content_format)
-        blob = getattr(self, 'blob', self.bucket.blob(self.full_path))
-        blob.upload_from_file(file_obj=buffer, content_type=self.content_type, rewind=True)
-        self.blob = blob
+        super().put(buffer, content_type=content_type)
         
     def resize(self, size, target_path, bucket=None):
         if not hasattr(self, 'image'):
@@ -69,3 +85,6 @@ class ndbImage(object):
         resize.content_type = self.content_type
         resize.image = self.image.resize(size)
         return resize
+    
+    def get_media_link(self):
+        return self.blob.media_link

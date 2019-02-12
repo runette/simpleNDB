@@ -65,11 +65,18 @@ class Client(datastore.Client):
         return Query(self, **kwargs)
 
 class Key(datastore.Key):
-    def get(self, key, **kwargs):
-        if not self.client:
-            self.client=datastore.Client()
-        object = self.client.get(key, **kwargs)
-        return    
+    def __init__(self, *args, **kwargs):
+        self._class_object = kwargs['class_obj']
+        self._client = datastore.Client()
+        project=self._client.project
+        kwargs['project'] = project
+        super().__init__(*args, **kwargs)
+    
+    def get(self, **kwargs):
+        item = self._client.get(self, **kwargs)
+        item.__class__ = self._class_object
+        item.schema()
+        return item
 
 class Query(datastore.Query):
     _class_object = object
@@ -183,6 +190,12 @@ class Model(datastore.Entity):
             setattr(self, key, value)
         return
     
+    @classmethod
+    def Key(cls, id):
+        my_class = cls.__name__
+        return Key(my_class, id, class_obj=cls )
+    
+    
     def Property(self, name, prop_type, **kwargs):
         details =  {
             'type': prop_type,
@@ -193,7 +206,7 @@ class Model(datastore.Entity):
     
     def setter(self, name, value):
         typeof = self._properties[name]['type'].value[2]
-        repeated = to_bool(self._properties[name]['kwargs'].get('repeated', False))
+        repeated = helpers.to_bool(self._properties[name]['kwargs'].get('repeated', False))
         if repeated:
             if self[name] and (type(self[name]) == list) and type(value) == typeof:
                 self[name].append(value)
