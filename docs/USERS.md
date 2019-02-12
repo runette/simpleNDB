@@ -1,7 +1,7 @@
 # images Module
 ## Purpose
 
-This module provides wrappers to the [Google Cloud Storage Client library](https://googleapis.github.io/google-cloud-python/latest/index.html)  and [Firebase Authenticaton]() to give them some of the functionality of te appenegine users api and to work nicely together.
+This module provides wrappers to the [Google Cloud Storage Client library](https://googleapis.github.io/google-cloud-python/latest/index.html)  and [Firebase Authenticaton](https://firebase.google.com/docs/) to give them some of the functionality of te appenegine users api and to work nicely together.
 
 This library can work in any run time environment - not just GAE.
 
