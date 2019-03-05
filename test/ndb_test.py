@@ -51,5 +51,11 @@ def test_1():
     assert gun.date.year == datetime.now().year
     gun.location == GeoPt(52, 1)
     gun.put()
+
+
+def test_2()
+    image = ndbImage(
+
+
     
     
