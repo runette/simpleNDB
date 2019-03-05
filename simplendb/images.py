@@ -24,7 +24,7 @@ from google.cloud import storage
 from PIL import Image
 import io
 
-__all__=["ndbImage"]
+__all__=["ndbImage", "Blob"]
 
 
 class Blob(object):  
