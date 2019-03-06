@@ -111,12 +111,16 @@ class ndb(Enum):
     EnumProperty = (9, True, int)
 
 class Model(datastore.Entity):
-    _properties = {}
     
     def schema(self):
+        try:
+            x=self._properties
+        except:
+            self.update({"_properties":{}})
         return
     
     def __init__(self, **kwargs):
+        self.update({"_properties":{}})
         client = Client()
         self.schema()
         exclude_from_indexes = []
@@ -142,18 +146,22 @@ class Model(datastore.Entity):
         return
     
     def __getattr__(self, name):
-            if name in self._properties:
-                try:
-                    return getattr(self, self._properties[name]['type'].name)(name)
-                except:
-                    return None
-            else:
-                try:
-                    return self[name]
-                except:
-                    return None
+        if name == '_properties':
+            return self[name]
+        if name in self._properties:
+            try:
+                return getattr(self, self._properties[name]['type'].name)(name)
+            except:
+                return None
+        else:
+            try:
+                return self[name]
+            except:
+                return None
         
     def __setattr__(self, name, value):
+        if name == '_properties':
+            return self[name]        
         if name in self._properties:
             return getattr(self, "set_" + self._properties[name]['type'].name)(name, value)
         else:
