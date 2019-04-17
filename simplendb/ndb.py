@@ -267,7 +267,6 @@ class Model(datastore.Entity):
     def set_GeoPtProperty(self, name, value):
         return self.setter(name, value)
 
-
     def EnumProperty(self, name):
         enum = self._properties[name]['kwargs']['enum']
         if not enum:
