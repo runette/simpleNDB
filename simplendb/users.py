@@ -26,6 +26,9 @@ from attrdict import AttrDict
 
 __all__=["UserStatus"]
 
+class User(AttrDict):
+    pass
+
 
 def UserStatus(id_token):
     
@@ -50,7 +53,7 @@ def UserStatus(id_token):
         # http://flask.pocoo.org/docs/1.0/quickstart/#sessions).
         claims = google.oauth2.id_token.verify_firebase_token(
                 id_token, google.auth.transport.requests.Request())
-        user = AttrDict({'email':claims.get('email', ""), 'name': claims.get('name', "anon"), 'photo':claims.get('photo', "")})
+        user = User({'user_id':claims.get('user_id',None),'email':claims.get('email', ""), 'name': claims.get('name', "anon"), 'photo':claims.get('picture', ""), 'claims':claims})
         url = "javascript:firebase.auth().signOut()"
         message = "OK"
         url_linktext = 'Logout'            
@@ -60,4 +63,4 @@ def UserStatus(id_token):
         message = str(exc)  
         url = "javascript:ui.start('#firebaseui-auth-container', uiConfig)"
         url_linktext = 'Login'            
-    return {'user': user, 'url': url, 'url_linktext': url_linktext, 'message': message}
+    return AttrDict({'user': user, 'url': url, 'url_linktext': url_linktext, 'message': message})

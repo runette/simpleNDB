@@ -31,7 +31,7 @@ from . import helpers
 from  attrdict import AttrDict
 
 __all__= ["Modal", "Key", "Query", "Client", "ndb", "GeoPt"]
-          
+
 class GeoPt(datastore.helpers.GeoPoint):
     def __init__(self, lat, long):
         if isinstance(lat, float) and isinstance(long, float):
@@ -47,12 +47,12 @@ class GeoPt(datastore.helpers.GeoPoint):
                 else:
                     long = float(long)
                 if isinstance(lat, float) and isinstance(long, float):
-                    return super().__init__(lat, long)  
+                    return super().__init__(lat, long)
                 else:
                     raise TypeError("GeoPt - input paramaters cannot be converted to float")
             except Exception as e:
                 raise TypeError("GeoPt - input paramaters cannot be converted to float :  " + str(e))
-            
+
 
 class Client(datastore.Client):
     def query(self, **kwargs):
@@ -72,20 +72,20 @@ class Key(datastore.Key):
         project=self._client.project
         kwargs['project'] = project
         super().__init__(*args, **kwargs)
-    
+
     def get(self, **kwargs):
         item = self._client.get(self, **kwargs)
         if item:
             item.__class__ = self._class_object
             item.schema()
         return item
-    
+
     def delete(self):
         return self._client.delete(self)
 
 class Query(datastore.Query):
     _class_object = object
-    
+
     def fetch(self, *args, **kwargs):
         item_list = super().fetch(*args, **kwargs)
         response = []
@@ -94,7 +94,7 @@ class Query(datastore.Query):
             item.schema()
             response.append(item)
         return response
-    
+
     def get(self, *args, **kwargs):
         #TODO make this more eficient by not calling the entire iterator
         list = self.fetch(*args, **kwargs)
@@ -102,7 +102,7 @@ class Query(datastore.Query):
             return list[0]
         else:
             return None
-        
+
 class ndb(Enum):
     IntegerProperty = (0, True, int)
     FloatProperty = (1, False, float)
@@ -117,14 +117,14 @@ class ndb(Enum):
 
 
 class Model(datastore.Entity):
-    
+
     def schema(self):
         try:
             x=self._properties
         except:
             self.update({"_properties":{}})
         return
-    
+
     def __init__(self, **kwargs):
         self.update({"_properties":{}})
         client = Client()
@@ -151,7 +151,7 @@ class Model(datastore.Entity):
         if kwargs:
             self.populate(**kwargs)
         return
-    
+
     def __getattr__(self, name):
         if name == '_properties':
             return self[name]
@@ -165,10 +165,10 @@ class Model(datastore.Entity):
                 return self[name]
             except:
                 return None
-        
+
     def __setattr__(self, name, value):
         if name == '_properties':
-            return self[name]        
+            return self[name]
         if name in self._properties:
             return getattr(self, "set_" + self._properties[name]['type'].name)(name, value)
         else:
@@ -176,15 +176,15 @@ class Model(datastore.Entity):
                 self[name] = value
             except:
                 raise AttributeError("No such attribute: " + str(name))
-    
+
     def items(self):
         dummy = {}
         for key in self._properties:
             value = self.get(key, None)
             if value != None:
                 dummy.update({key:value})
-        return dummy.items()    
-    
+        return dummy.items()
+
     @classmethod
     def query(cls, *args, **kwargs):
         my_class = cls.__name__
@@ -194,24 +194,24 @@ class Model(datastore.Entity):
         response.__class__ = Query
         response._class_object = cls
         return response
-    
+
     @classmethod
     def get_by_id(cls, id, **kwargs):
         return cls.Key(id, **kwargs).get()
-    
+
     def put(self):
         client = Client()
         client.put(self)
         return
-    
+
     def populate(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
         return
-    
+
     def delete(self):
         return self.get_key().delete()
-    
+
     @classmethod
     def Key(cls, id, **kwargs):
         my_class = cls.__name__
@@ -222,7 +222,7 @@ class Model(datastore.Entity):
         key.__class__ = Key
         key._client = datastore.Client()
         return key
-    
+
     def Property(self, name, prop_type, **kwargs):
         details =  {
             'type': prop_type,
@@ -230,7 +230,7 @@ class Model(datastore.Entity):
         }
         self._properties.update({name:details})
         return
-    
+
     def setter(self, name, value):
         typeof = self._properties[name]['type'].value[2]
         repeated = helpers.to_bool(self._properties[name]['kwargs'].get('repeated', False))
@@ -244,59 +244,59 @@ class Model(datastore.Entity):
                 self[name] = value
             elif type(value) == typeof:
                 self[name] = [value]
-        elif isinstance(value, typeof): 
+        elif isinstance(value, typeof):
                 self[name] = value
         else:
             raise TypeError(name + " takes " + str(typeof) + " but received " + str(type(value)))
-    
+
     def IntegerProperty(self, name):
         return self[name]
-    
+
     def set_IntegerProperty(self, name, value):
         return self.setter(name, value)
-    
+
     def StringProperty(self, name):
         return self[name]
-    
+
     def set_StringProperty(self, name, value):
         return self.setter(name, value)
-    
+
     def GeoPtProperty(self, name):
         return self[name]
-    
+
     def set_GeoPtProperty(self, name, value):
         return self.setter(name, value)
-    
-   
+
+
     def EnumProperty(self, name):
         enum = self._properties[name]['kwargs']['enum']
         if not enum:
             raise TypeError("EnumProperty must have enum")
         return enum(self[name])
-    
+
     def set_EnumProperty(self, name, value):
         if isinstance(value, Enum):
             return self.setter(name, value.value)
         else:
             raise TypeError("EnumProperty must have enum - received - " + str(type(value)))
-    
+
     def DateTimeProperty(self, name):
         return self[name]
-    
+
     def set_DateTimeProperty(self, name, value):
-        return self.setter(name, value) 
-    
+        return self.setter(name, value)
+
     def BooleanProperty(self, name):
         return self[name]
-    
+
     def set_BooleanProperty(self, name, value):
-        return self.setter(name, value)  
-    
+        return self.setter(name, value)
+
     def TextProperty(self, name):
         return self[name]
-    
+
     def set_TextProperty(self, name, value):
-        return self.setter(name, value)    
+        return self.setter(name, value)
 
     def JsonProperty(self, name):
         value = self[name]
@@ -307,12 +307,12 @@ class Model(datastore.Entity):
             return response
         else:
             return json.loads(value,object_hook=AttrDict)
-    
+
     def set_JsonProperty(self, name, value):
         if isinstance(value, dict) or isinstance(value, list) :
             value=json.dumps(value)
         return self.setter(name, value)
-    
+
     def KeyProperty(self, name):
         kind = self._properties[name]['kwargs']['kind']
         if not kind:
@@ -333,8 +333,8 @@ class Model(datastore.Entity):
                 value._class_object = kind
                 return value
         except Exception as e:
-            raise TypeError("bad type in KeyProperty" + str(e))         
-    
+            raise TypeError("bad type in KeyProperty" + str(e))
+
     def set_KeyProperty(self, name, value):
         kind = self._properties[name]['kwargs']['kind']
         if isinstance(value, Key):
@@ -343,4 +343,4 @@ class Model(datastore.Entity):
             else:
                 raise TypeError("Exepected key of kind : " + kind.__name__ + ". Received :" + value.kind())
         else:
-            raise TypeError("KeyProperty must be a ndb.Key - received - " + str(type(value)))        
+            raise TypeError("KeyProperty must be a ndb.Key - received - " + str(type(value)))

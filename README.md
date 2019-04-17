@@ -1,6 +1,6 @@
 # simpleNDB
 
-[![Travis CI](https://travis-ci.com/runette/simpleNDB.svg?branch=master&style=flat)](https://travis-ci.org/runette/simpleNDB)
+[![Travis CI](https://travis-ci.org/runette/simpleNDB.svg?branch=master&style=flat)](https://travis-ci.org/runette/simpleNDB)
 [![Python versions](https://img.shields.io/pypi/pyversions/simpleNDB.svg)](https://pypi.python.org/pypi/simpleNDB)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/runette/simpleNDB/blob/master/LICENSE)
 [![Known Vulnerabilities](https://snyk.io/test/github/runette/simpleNDB/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/runette/simpleNDB?targetFile=requirements.txt)
@@ -23,8 +23,8 @@ from simplendb import ndb, images, users
 To use the individual components, see :
 
 - [NDB](docs/NDB.md)
-- [Users](docs/Users.md)
-- [Images](docs/Images.md)
+- [Users](docs/USERS.md)
+- [Images](docs/IMAGES.md)
 
 ## Background and Concepts
 
