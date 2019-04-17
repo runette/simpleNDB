@@ -28,6 +28,7 @@ from google.cloud import datastore
 from google.cloud.datastore.helpers import GeoPoint
 import requests
 from . import helpers
+from  attrdict import AttrDict
 
 __all__= ["Modal", "Key", "Query", "Client", "ndb", "GeoPt"]
           
@@ -65,11 +66,22 @@ class Client(datastore.Client):
         return Query(self, **kwargs)
 
 class Key(datastore.Key):
-    def get(self, key, **kwargs):
-        if not self.client:
-            self.client=datastore.Client()
-        object = self.client.get(key, **kwargs)
-        return    
+    def __init__(self, *args, **kwargs):
+        self._class_object = kwargs['class_obj']
+        self._client = datastore.Client()
+        project=self._client.project
+        kwargs['project'] = project
+        super().__init__(*args, **kwargs)
+    
+    def get(self, **kwargs):
+        item = self._client.get(self, **kwargs)
+        if item:
+            item.__class__ = self._class_object
+            item.schema()
+        return item
+    
+    def delete(self):
+        return self._client.delete(self)
 
 class Query(datastore.Query):
     _class_object = object
@@ -103,16 +115,22 @@ class ndb(Enum):
     JsonProperty = (8, False, str)
     EnumProperty = (9, True, int)
 
+
 class Model(datastore.Entity):
-    _properties = {}
     
     def schema(self):
+        try:
+            x=self._properties
+        except:
+            self.update({"_properties":{}})
         return
     
     def __init__(self, **kwargs):
+        self.update({"_properties":{}})
         client = Client()
         self.schema()
         exclude_from_indexes = []
+        parent = kwargs.get('parent')
         for name, value in self._properties.items():
             kw = value.get('kwargs')
             prop_type = value.get('type')
@@ -129,24 +147,28 @@ class Model(datastore.Entity):
                 setattr(self, name, default)
             if auto_now and prop_type == ndb.DateTimeProperty:
                 setattr(self, name, datetime.now())
-        super().__init__(key=client.key(type(self).__name__), exclude_from_indexes= exclude_from_indexes )
+        super().__init__(key=client.key(type(self).__name__, parent=parent), exclude_from_indexes= exclude_from_indexes )
         if kwargs:
             self.populate(**kwargs)
         return
     
     def __getattr__(self, name):
-            if name in self._properties:
-                try:
-                    return getattr(self, self._properties[name]['type'].name)(name)
-                except:
-                    return None
-            else:
-                try:
-                    return self[name]
-                except:
-                    return None
+        if name == '_properties':
+            return self[name]
+        if name in self._properties:
+            try:
+                return getattr(self, self._properties[name]['type'].name)(name)
+            except:
+                return None
+        else:
+            try:
+                return self[name]
+            except:
+                return None
         
     def __setattr__(self, name, value):
+        if name == '_properties':
+            return self[name]        
         if name in self._properties:
             return getattr(self, "set_" + self._properties[name]['type'].name)(name, value)
         else:
@@ -173,6 +195,10 @@ class Model(datastore.Entity):
         response._class_object = cls
         return response
     
+    @classmethod
+    def get_by_id(cls, id, **kwargs):
+        return cls.Key(id, **kwargs).get()
+    
     def put(self):
         client = Client()
         client.put(self)
@@ -182,6 +208,20 @@ class Model(datastore.Entity):
         for key, value in kwargs.items():
             setattr(self, key, value)
         return
+    
+    def delete(self):
+        return self.get_key().delete()
+    
+    @classmethod
+    def Key(cls, id, **kwargs):
+        my_class = cls.__name__
+        return Key(my_class, id, class_obj=cls, **kwargs )
+
+    def get_key(self):
+        key = self.key
+        key.__class__ = Key
+        key._client = datastore.Client()
+        return key
     
     def Property(self, name, prop_type, **kwargs):
         details =  {
@@ -193,7 +233,7 @@ class Model(datastore.Entity):
     
     def setter(self, name, value):
         typeof = self._properties[name]['type'].value[2]
-        repeated = to_bool(self._properties[name]['kwargs'].get('repeated', False))
+        repeated = helpers.to_bool(self._properties[name]['kwargs'].get('repeated', False))
         if repeated:
             if self[name] and (type(self[name]) == list) and type(value) == typeof:
                 self[name].append(value)
@@ -220,7 +260,6 @@ class Model(datastore.Entity):
     
     def set_StringProperty(self, name, value):
         return self.setter(name, value)
-    
     
     def GeoPtProperty(self, name):
         return self[name]
@@ -260,7 +299,48 @@ class Model(datastore.Entity):
         return self.setter(name, value)    
 
     def JsonProperty(self, name):
-        return self[name]
+        value = self[name]
+        if isinstance(value, list):
+            response = []
+            for item in value:
+                response.append(json.loads(item,object_hook=AttrDict))
+            return response
+        else:
+            return json.loads(value,object_hook=AttrDict)
     
     def set_JsonProperty(self, name, value):
+        if isinstance(value, dict) or isinstance(value, list) :
+            value=json.dumps(value)
         return self.setter(name, value)
+    
+    def KeyProperty(self, name):
+        kind = self._properties[name]['kwargs']['kind']
+        if not kind:
+            raise TypeError("KeyProperty must have kind")
+        value = self[name]
+        try:
+            if isinstance(value, list):
+                response = []
+                for item in value:
+                    item.__class__ = Key
+                    item._client = datastore.Client()
+                    item._class_object = kind
+                    response.append(item)
+                return response
+            else:
+                value.__class__ = Key
+                value._client = datastore.Client()
+                value._class_object = kind
+                return value
+        except Exception as e:
+            raise TypeError("bad type in KeyProperty" + str(e))         
+    
+    def set_KeyProperty(self, name, value):
+        kind = self._properties[name]['kwargs']['kind']
+        if isinstance(value, Key):
+            if value.kind == kind.__name__:
+                return self.setter(name, value)
+            else:
+                raise TypeError("Exepected key of kind : " + kind.__name__ + ". Received :" + value.kind())
+        else:
+            raise TypeError("KeyProperty must be a ndb.Key - received - " + str(type(value)))        
