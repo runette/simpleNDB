@@ -41,8 +41,8 @@ class Gun(Model):
         self.Property("interpretation", ndb.BooleanProperty)
         self.Property("inter_details", ndb.StringProperty)
         self.Property("country", ndb.StringProperty, default="none")
-        self.Property("geocode", ndb.JsonProperty)
-        self.Property("neighbour", ndb.KeyProperty, repeated=True)
+        self.Property("geocode", ndb.JsonProperty, repeated=True)
+        self.Property("neighbour", ndb.KeyProperty, kind=Gun, repeated=True)
 
 def test_1():
     gun = Gun()
@@ -50,7 +50,6 @@ def test_1():
     assert gun.images == []
     assert gun.key.kind == 'Gun'
     assert type(gun) == Gun
-    assert type(gun.get_key()) == Key
     assert gun.date.year == datetime.now().year
     gun.location = GeoPt(52, 1)
     gun.geocode =  {'test': 'name','test2': 'name2' }
@@ -59,9 +58,18 @@ def test_1():
     assert gun.quality == Gun.Quality.BRONZE
     assert gun.images == []
     assert gun.key.kind == 'Gun'
-    assert type(gun) == gun
+    assert type(gun) == Gun
     assert type(gun.get_key()) == Key
     assert gun.date.year == datetime.now().year
     assert gun.location == GeoPt(52,1)
-    assert gun.geocode == {'test': 'name','test2': 'name2' }
+    assert gun.geocode == [{'test': 'name','test2': 'name2' }]
+    gun.geocode = [{'test': 'name','test2': 'name2' }]
+    gun2 = Gun()
+    gun2.put()
+    gun.neighbour = gun2.get_key()
+    gun.put()
+    Gun.get_by_id(gun.key.id)
+    assert gun.geocode == [{'test': 'name','test2': 'name2' }]
+    assert gun.neighbour == [gun2.get_key()]
     gun.delete()
+    gun2.delete()
