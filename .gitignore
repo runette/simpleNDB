@@ -4331,3 +4331,5 @@ simplendb.egg-info/requires.txt
 simplendb.egg-info/PKG-INFO
 simplendb.egg-info/dependency_links.txt
 build/lib/simplendb/users.py
+*.whl
+*.gz
