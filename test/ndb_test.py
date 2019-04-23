@@ -49,7 +49,7 @@ def test_1():
     assert gun.quality == Gun.Quality.BRONZE
     assert gun.images == []
     assert gun.key.kind == 'Gun'
-    assert type(gun) == gun
+    assert type(gun) == Gun
     assert type(gun.get_key()) == Key
     assert gun.date.year == datetime.now().year
     gun.location = GeoPt(52, 1)
