@@ -7,6 +7,7 @@ from simplendb.ndb import Model, Query, Key, GeoPt, ndb
 from simplendb.users import UserStatus
 from simplendb.images import ndbImage
 from simplendb.helpers import to_bool, to_int
+from attrdict import AttrDict
 
 
 
@@ -62,14 +63,14 @@ def test_1():
     assert type(gun.get_key()) == Key
     assert gun.date.year == datetime.now().year
     assert gun.location == GeoPt(52,1)
-    assert gun.geocode == [{'test': 'name','test2': 'name2' }]
+    assert gun.geocode == [AttrDict({'test': 'name','test2': 'name2' })]
     gun.geocode = [{'test': 'name','test2': 'name2' }]
     gun2 = Gun()
     gun2.put()
     gun.neighbour = gun2.get_key()
     gun.put()
     Gun.get_by_id(gun.key.id)
-    assert gun.geocode == [{'test': 'name','test2': 'name2' }]
+    assert gun.geocode == [AttrDict({'test': 'name','test2': 'name2' })]
     assert gun.neighbour == [gun2.get_key()]
     gun.delete()
     gun2.delete()
