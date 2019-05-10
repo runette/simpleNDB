@@ -68,20 +68,19 @@ class Client(datastore.Client):
 class Key(datastore.Key):
     def __init__(self, *args, **kwargs):
         self._class_object = kwargs['class_obj']
-        self._client = datastore.Client()
-        project=self._client.project
+        project = datastore.Client().project
         kwargs['project'] = project
         super().__init__(*args, **kwargs)
     
     def get(self, **kwargs):
-        item = self._client.get(self, **kwargs)
+        item = datastore.Client().get(self, **kwargs)
         if item:
             item.__class__ = self._class_object
             item.schema()
         return item
     
     def delete(self):
-        return self._client.delete(self)
+        return datastore.Client().delete(self)
 
 class Query(datastore.Query):
     _class_object = object
@@ -154,7 +153,7 @@ class Model(datastore.Entity):
     
     def __getattr__(self, name):
         if name == '_properties':
-            return self[name]
+            return self['_properties']
         if name in self._properties:
             try:
                 return getattr(self, self._properties[name]['type'].name)(name)
@@ -168,7 +167,8 @@ class Model(datastore.Entity):
         
     def __setattr__(self, name, value):
         if name == '_properties':
-            return self[name]        
+            self[name] = value
+            return
         if name in self._properties:
             return getattr(self, "set_" + self._properties[name]['type'].name)(name, value)
         else:
@@ -177,6 +177,21 @@ class Model(datastore.Entity):
             except:
                 raise AttributeError("No such attribute: " + str(name))
     
+    def __getstate__(self):
+        dummy = self.__dict__
+        dummy.update({'key': self.key})
+        for name in self._properties:
+            dummy.update({name: self.__getattr__(name)})
+        dummy.update({'_properties': self._properties})
+        return dummy
+    
+    def __setstate__(self, dict):
+        self._properties = dict.pop('_properties')
+        for name, value in dict.items():
+            if value is not None:
+                self.__setattr__(name, value)
+        return
+
     def items(self):
         dummy = {}
         for key in self._properties:
@@ -221,7 +236,6 @@ class Model(datastore.Entity):
     def get_key(self):
         key = self.key
         key.__class__ = Key
-        key._client = datastore.Client()
         return key
     
     def Property(self, name, prop_type, **kwargs):
@@ -330,13 +344,11 @@ class Model(datastore.Entity):
                 response = []
                 for item in value:
                     item.__class__ = Key
-                    item._client = datastore.Client()
                     item._class_object = kind
                     response.append(item)
                 return response
             else:
                 value.__class__ = Key
-                value._client = datastore.Client()
                 value._class_object = kind
                 return value
         except Exception as e:
