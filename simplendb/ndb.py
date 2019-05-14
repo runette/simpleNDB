@@ -28,9 +28,18 @@ from google.cloud import datastore
 from google.cloud.datastore.helpers import GeoPoint
 import requests
 from . import helpers
-from  attrdict import AttrDict
+from attrdict import AttrDict
+import threading
 
-__all__= ["Modal", "Key", "Query", "Client", "ndb", "GeoPt"]
+__all__ = ["Modal", "Key", "Query", "Client", "ndb", "GeoPt"]
+
+client_store = threading.local()
+
+def get_client():
+    if not hasattr(client_store, 'client'):
+        client_store.client = Client()
+    return client_store.client
+
           
 class GeoPt(datastore.helpers.GeoPoint):
     def __init__(self, lat, long):
@@ -68,19 +77,19 @@ class Client(datastore.Client):
 class Key(datastore.Key):
     def __init__(self, *args, **kwargs):
         self._class_object = kwargs['class_obj']
-        project = datastore.Client().project
+        project = get_client().project
         kwargs['project'] = project
         super().__init__(*args, **kwargs)
     
     def get(self, **kwargs):
-        item = datastore.Client().get(self, **kwargs)
+        item = get_client().get(self, **kwargs)
         if item:
             item.__class__ = self._class_object
             item.schema()
         return item
     
     def delete(self):
-        return datastore.Client().delete(self)
+        return get_client().delete(self)
 
 class Query(datastore.Query):
     _class_object = object
@@ -126,7 +135,7 @@ class Model(datastore.Entity):
     
     def __init__(self, **kwargs):
         self.update({"_properties":{}})
-        client = Client()
+        client = get_client()
         self.schema()
         exclude_from_indexes = []
         parent = kwargs.get('parent')
