@@ -42,7 +42,7 @@ class Gun(Model):
         self.Property("interpretation", ndb.BooleanProperty)
         self.Property("inter_details", ndb.StringProperty)
         self.Property("country", ndb.StringProperty, default="none")
-                     self.Property("geocode", ndb.JsonProperty, repeated=True)
+        self.Property("geocode", ndb.JsonProperty, repeated=True)
         self.Property("neighbour", ndb.KeyProperty, kind=Gun, repeated=True)
 
 def test_1():
