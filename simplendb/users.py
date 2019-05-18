@@ -63,4 +63,4 @@ def UserStatus(id_token):
         message = str(exc)  
         url = "javascript:ui.start('#firebaseui-auth-container', uiConfig)"
         url_linktext = 'Login'            
-    return AttrDict({'user': user, 'url': url, 'url_linktext': url_linktext, 'message': message})
+    return AttrDict({'user': user, 'url': url, 'url_linktext': url_linktext, 'message': message, 'id_token': id_token})

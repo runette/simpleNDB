@@ -30,6 +30,7 @@ import requests
 from . import helpers
 from attrdict import AttrDict
 import threading
+import pickle
 
 __all__ = ["Modal", "Key", "Query", "Client", "ndb", "GeoPt"]
 
@@ -122,6 +123,9 @@ class ndb(Enum):
     KeyProperty = (7, True, Key)
     JsonProperty = (8, False, str)
     EnumProperty = (9, True, int)
+    DictProperty = (10, False, dict)
+    PickleProperty = (11, False, bytes)
+    EntityProperty = (12, False, dict)
 
 
 class Model(datastore.Entity):
@@ -256,22 +260,23 @@ class Model(datastore.Entity):
         return
     
     def setter(self, name, value):
-        typeof = self._properties[name]['type'].value[2]
+        mytype = self._properties[name]['type'].value[2]
+        istype = isinstance(value, mytype)
         repeated = helpers.to_bool(self._properties[name]['kwargs'].get('repeated', False))
         if repeated:
-            if self[name] and (type(self[name]) == list) and type(value) == typeof:
+            if self[name] and istype:
                 self[name].append(value)
             elif type(value) == list:
                 for item in value:
-                    if type(item) != typeof:
-                        raise TypeError(name + " takes " + str(typeof) + " but received " + str(type(item)))
+                    if not isinstance(item, mytype):
+                        raise TypeError(name + " takes " + str(mytype) + " but received " + str(type(item)))
                 self[name] = value
-            elif type(value) == typeof:
+            elif istype:
                 self[name] = [value]
-        elif isinstance(value, typeof): 
+        elif istype:
                 self[name] = value
         else:
-            raise TypeError(name + " takes " + str(typeof) + " but received " + str(type(value)))
+            raise TypeError(name + " takes " + str(mytype) + " but received " + str(type(value)))
     
     def IntegerProperty(self, name):
         return self[name]
@@ -287,10 +292,37 @@ class Model(datastore.Entity):
     
     def GeoPtProperty(self, name):
         return self[name]
-    
+
     def set_GeoPtProperty(self, name, value):
         return self.setter(name, value)
+
+    def DictProperty(self, name):
+        value = self[name]
+        if isinstance(value, dict):
+            return AttrDict(value)
+        else:
+            try:
+                list = []
+                for item in value:
+                    list.append(AttrDict(item))
+                return list
+            except:
+                raise ValueError(f"Bad DictProperty Value - value is {type(value)}")
+
+    def set_DictProperty(self, name, value):
+        return self.setter(name, value)
+
+    def EntityProperty(self, name):
+        return self[name]
+
+    def set_EntityProperty(self, name, value):
+        return self.setter(name, value)
+
+    def PickleProperty(self, name):
+        return pickle.loads(self[name])
     
+    def set_PickleProperty(self, name, value):
+        return self.setter(name, pickle.dumps(value))
    
     def EnumProperty(self, name):
         enum = self._properties[name]['kwargs']['enum']
