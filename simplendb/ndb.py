@@ -142,7 +142,8 @@ class Model(datastore.Entity):
         client = get_client()
         self.schema()
         exclude_from_indexes = []
-        parent = kwargs.get('parent')
+        parent = kwargs.pop('parent', None)
+        namespace = kwargs.pop('namespace', None)
         for name, value in self._properties.items():
             kw = value.get('kwargs')
             prop_type = value.get('type')
@@ -159,7 +160,7 @@ class Model(datastore.Entity):
                 setattr(self, name, default)
             if auto_now and prop_type == ndb.DateTimeProperty:
                 setattr(self, name, datetime.now())
-        super().__init__(key=client.key(type(self).__name__, parent=parent), exclude_from_indexes= exclude_from_indexes )
+        super().__init__(key=client.key(type(self).__name__, parent=parent, namespace=namespace), exclude_from_indexes=exclude_from_indexes)
         if kwargs:
             self.populate(**kwargs)
         return
