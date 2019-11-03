@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="simpleNDB",
-    version= "1.0.4",
+    version= "1.0.5",
     author="Paul Harwood",
     author_email="runette@gmail.com",
     description="A very simple package to make Google Cloud Clients look more like appengine.api and NDB",
