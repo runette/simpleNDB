@@ -86,5 +86,24 @@ class ndbImage(Blob):
         resize.image = self.image.resize(size)
         return resize
     
+    def thumbnail(self, size, target_path, bucket=None):
+        if not hasattr(self, 'image'):
+            raise ValueError("No Image to resize")
+        if not bucket:
+            bucket = self.bucket
+        resize = ndbImage(target_path, bucket.name)
+        resize.content_format = self.content_format
+        resize.content_type = self.content_type
+        resize.image = self.image.copy()
+        resize.image.thumbnail(size, Image.ANTIALIAS)
+        return resize
+
+    def copy(self):
+        image = Image(self.full_path, self.bucket_name)
+        image.content_format = self.content_format
+        image.content_type = self.content_type
+        image.image = self.image.copy()
+        return image
+
     def get_media_link(self):
         return self.blob.media_link
