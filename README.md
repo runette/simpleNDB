@@ -1,3 +1,6 @@
+> NOTE - this library is deprecated and is not maintained. 
+> Use [Google NDB](https://googleapis.dev/python/python-ndb/latest/index.html) instead
+
 # simpleNDB
 
 [![Travis CI](https://travis-ci.org/runette/simpleNDB.svg?branch=master&style=flat)](https://travis-ci.org/runette/simpleNDB)
